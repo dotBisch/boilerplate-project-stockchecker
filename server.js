@@ -6,9 +6,14 @@ const cors = require("cors");
 
 const apiRoutes = require("./routes/api.js");
 const fccTestingRoutes = require("./routes/fcctesting.js");
-const runner = require("./test-runner");
 const helmet = require("helmet");
 require("./db-connection");
+
+// Only load test runner in test environment
+let runner;
+if (process.env.NODE_ENV === "test") {
+  runner = require("./test-runner");
+}
 
 const app = express();
 
@@ -48,7 +53,7 @@ app.use(function (req, res, next) {
 //Start our server and tests!
 app.listen(process.env.PORT || 3000, function () {
   console.log("Listening on port " + process.env.PORT);
-  if (process.env.NODE_ENV === "test") {
+  if (process.env.NODE_ENV === "test" && runner) {
     console.log("Running Tests...");
     setTimeout(function () {
       try {
