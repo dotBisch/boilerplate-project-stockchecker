@@ -1,28 +1,8 @@
-#userstories {
-  margin-left: 5%;
-  margin-top: 5%;
+body {
+    font-family: "Lato", sans-serif;
+    text-align: center;
 }
 
-.p-50 {
-  margin: 50px;
-}
-
-#testui {
-  margin-left: 5%;
-}
-
-.text-align-left {
-  text-align: left;
-}
-
-input[type='text'] {
-  width: 100px;
-}
-
-.m-50 {
-  margin: 50px;
-}
-
-.mt-200 {
-  margin-top: 200px;
+footer {
+    margin-top: 4rem;
 }
