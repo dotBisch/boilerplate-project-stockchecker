@@ -4,6 +4,7 @@
 	"description": "InfoSec project for freeCodeCamp",
 	"scripts": {
 		"start": "node server.js",
+		"test": "cross-env NODE_ENV=test mocha --require dotenv/config --timeout 5000 --recursive --exit --ui tdd tests/",
 		"dev": "nodemon server.js"
 	},
 	"dependencies": {
@@ -11,10 +12,13 @@
 		"chai": "^4.2.0",
 		"chai-http": "^4.3.0",
 		"cors": "^2.8.1",
+		"cross-env": "^10.0.0",
 		"dotenv": "^8.2.0",
 		"express": "^4.14.0",
 		"helmet": "^3.1.0",
 		"mocha": "^3.2.0",
+		"mongoose": "^7.5.2",
+		"node-fetch": "^2.7.0",
 		"nodemon": "^3.1.10"
 	},
 	"repository": {
