@@ -8,13 +8,15 @@ const connectDB = async () => {
   }
 
   try {
-    // Only attempt connection if DB environment variable exists
-    if (!process.env.DB) {
-      console.log('No DB environment variable found, skipping database connection');
+    // Check for database connection string in multiple environment variables
+    const connectionString = process.env.DB || process.env.MONGO_URL || process.env.MONGODB_URI;
+    
+    if (!connectionString) {
+      console.log('No database environment variable found (DB, MONGO_URL, or MONGODB_URI), skipping database connection');
       return;
     }
 
-    await mongoose.connect(process.env.DB, {
+    await mongoose.connect(connectionString, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
