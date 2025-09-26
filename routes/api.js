@@ -115,7 +115,7 @@ module.exports = function (app) {
         const stockData = await getStock(stock);
 
         if (!stockData.symbol) {
-          return res.json({ stockData: { likes: like ? 1 : 0 } });
+          return res.json({ error: 'invalid stock' });
         }
 
         const dbStock = saveStock(stock, like, ip);

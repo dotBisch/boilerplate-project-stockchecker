@@ -24,14 +24,11 @@ connectDB();
 const app = express();
 
 // Security with helmet - Content Security Policy
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "https://cdn.freecodecamp.org"]
-    }
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'"],
+    styleSrc: ["'self'"]
   }
 }));
 
@@ -41,14 +38,6 @@ app.use(cors({origin: '*'})); //For FCC testing purposes only
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'"],
-    styleSrc: ["'self'"]
-  }
-}));
 
 //Index page (static HTML)
 app.route('/')
