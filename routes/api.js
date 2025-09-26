@@ -6,36 +6,50 @@ function anonymizeIp(ip) {
   return crypto.createHash('sha256').update(ip).digest('hex');
 }
 
-const StockModel = require('../models').Stock;
 const fetch = require('node-fetch');
 
-async function createStock(stock, like, ip) {
-  const newStock = new StockModel({
-    symbol: stock.toUpperCase(),
-    likes: like ? [ip] : [],
-  });
-  const savedNew = await newStock.save();
-  return savedNew;
-}
+// In-memory storage for likes (resets on server restart)
+const stockLikes = new Map();
 
-async function findStock(stock) {
-  return await StockModel.findOne({ symbol: stock.toUpperCase() }).exec();
-}
-
-async function saveStock(stock, like, ip) {
-  let saved = {};
-  const foundStock = await findStock(stock);
-  if (!foundStock) {
-    const createsaved = await createStock(stock, like, ip);
-    saved = createsaved;
-    return saved;
-  } else {
-    if (like && foundStock.likes.indexOf(ip) === -1) {
-      foundStock.likes.push(ip);
-    }
-    saved = await foundStock.save();
-    return saved;
+function createStock(stock, like, ip) {
+  const symbol = stock.toUpperCase();
+  if (!stockLikes.has(symbol)) {
+    stockLikes.set(symbol, new Set());
   }
+  if (like) {
+    stockLikes.get(symbol).add(ip);
+  }
+  return {
+    symbol: symbol,
+    likes: Array.from(stockLikes.get(symbol) || [])
+  };
+}
+
+function findStock(stock) {
+  const symbol = stock.toUpperCase();
+  if (stockLikes.has(symbol)) {
+    return {
+      symbol: symbol,
+      likes: Array.from(stockLikes.get(symbol))
+    };
+  }
+  return null;
+}
+
+function saveStock(stock, like, ip) {
+  const symbol = stock.toUpperCase();
+  if (!stockLikes.has(symbol)) {
+    stockLikes.set(symbol, new Set());
+  }
+  
+  if (like && !stockLikes.get(symbol).has(ip)) {
+    stockLikes.get(symbol).add(ip);
+  }
+  
+  return {
+    symbol: symbol,
+    likes: Array.from(stockLikes.get(symbol))
+  };
 }
 
 async function getStock(stock) {
@@ -69,8 +83,8 @@ module.exports = function (app) {
         const stock1Data = await getStock(stock1);
         const stock2Data = await getStock(stock2);
 
-        const dbStock1 = await saveStock(stock1, like, ip);
-        const dbStock2 = await saveStock(stock2, like, ip);
+        const dbStock1 = saveStock(stock1, like, ip);
+        const dbStock2 = saveStock(stock2, like, ip);
         
         let stockData = [];
 
@@ -103,7 +117,7 @@ module.exports = function (app) {
           return res.json({ stockData: { likes: like ? 1 : 0 } });
         }
 
-        const dbStock = await saveStock(stock, like, ip);
+        const dbStock = saveStock(stock, like, ip);
 
         return res.json({
           stockData: {

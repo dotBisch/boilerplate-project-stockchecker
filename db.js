@@ -3,6 +3,12 @@ const mongoose = require('mongoose');
 let isConnected = false;
 
 const connectDB = async () => {
+  // Skip database connection for API-only mode
+  console.log('🚀 Running in API-only mode (no database required)');
+  console.log('📊 Stock prices will be fetched from external API');
+  console.log('⚠️  Likes functionality will use in-memory storage (resets on restart)');
+  return;
+  
   if (isConnected) {
     console.log('Database already connected, skipping connection attempt');
     return;
