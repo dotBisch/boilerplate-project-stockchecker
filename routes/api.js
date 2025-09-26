@@ -21,7 +21,7 @@ function createStock(stock, like, ip) {
   }
   return {
     symbol: symbol,
-    likes: Array.from(stockLikes.get(symbol) || [])
+    likes: stockLikes.get(symbol).size
   };
 }
 
@@ -30,7 +30,7 @@ function findStock(stock) {
   if (stockLikes.has(symbol)) {
     return {
       symbol: symbol,
-      likes: Array.from(stockLikes.get(symbol))
+      likes: stockLikes.get(symbol).size
     };
   }
   return null;
@@ -48,7 +48,7 @@ function saveStock(stock, like, ip) {
   
   return {
     symbol: symbol,
-    likes: Array.from(stockLikes.get(symbol))
+    likes: stockLikes.get(symbol).size
   };
 }
 
@@ -87,27 +87,25 @@ module.exports = function (app) {
         const dbStock1 = saveStock(stock1, like, ip);
         const dbStock2 = saveStock(stock2, like, ip);
         
-        let stockData = [];
+        if (!stock1Data.symbol || !stock2Data.symbol) {
+            return res.json({ error: 'invalid stock' });
+        }
 
-        if (stock1Data.symbol) {
-            stockData.push({
+        // Calculate rel_likes once and assign correctly
+        const relLikes = dbStock1.likes - dbStock2.likes;
+        
+        const stockData = [
+            {
                 stock: stock1Data.symbol,
                 price: stock1Data.latestPrice,
-                rel_likes: dbStock1.likes.length - dbStock2.likes.length
-            });
-        } else {
-            return res.json({ error: 'invalid stock' });
-        }
-
-        if (stock2Data.symbol) {
-            stockData.push({
+                rel_likes: relLikes
+            },
+            {
                 stock: stock2Data.symbol,
                 price: stock2Data.latestPrice,
-                rel_likes: dbStock2.likes.length - dbStock1.likes.length
-            });
-        } else {
-            return res.json({ error: 'invalid stock' });
-        }
+                rel_likes: -relLikes
+            }
+        ];
 
         return res.json({ stockData });
 
@@ -124,7 +122,7 @@ module.exports = function (app) {
           stockData: {
             stock: stockData.symbol,
             price: stockData.latestPrice,
-            likes: dbStock.likes.length,
+            likes: dbStock.likes,
           },
         });
       }
