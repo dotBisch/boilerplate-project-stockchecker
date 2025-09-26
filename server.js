@@ -23,6 +23,9 @@ connectDB();
 
 const app = express();
 
+// Trust first proxy for proper IP detection in production
+app.set('trust proxy', 1);
+
 // Security with helmet - Content Security Policy
 app.use(
   helmet.contentSecurityPolicy({

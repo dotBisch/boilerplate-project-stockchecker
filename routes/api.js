@@ -6,9 +6,23 @@ const fetch = require('node-fetch');
 // In-memory storage for likes
 const stockLikes = new Map();
 
-// IP anonymization
-function anonymizeIp(ip) {
-  return crypto.createHash('sha256').update(ip).digest('hex');
+// IP anonymization with better extraction
+function anonymizeIp(req) {
+  // Get real IP from various possible sources
+  const ip = req.ip || 
+             req.connection.remoteAddress || 
+             req.socket.remoteAddress ||
+             (req.connection.socket ? req.connection.socket.remoteAddress : null) ||
+             req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+             req.headers['x-real-ip'] ||
+             '127.0.0.1';
+  
+  const hashedIp = crypto.createHash('sha256').update(ip).digest('hex');
+  
+  // Debug logging (remove in production if needed)
+  console.log(`🔍 IP Debug - Original: ${ip}, Hashed: ${hashedIp.substring(0, 8)}...`);
+  
+  return hashedIp;
 }
 
 // Fetch stock data from FCC proxy
@@ -29,15 +43,24 @@ async function getStock(stock) {
 function saveLike(stock, like, ip) {
   const symbol = stock.toUpperCase();
   if (!stockLikes.has(symbol)) stockLikes.set(symbol, new Set());
-  if (like) stockLikes.get(symbol).add(ip);
-  return stockLikes.get(symbol).size;
+  
+  const sizeBefore = stockLikes.get(symbol).size;
+  if (like) {
+    stockLikes.get(symbol).add(ip);
+  }
+  const sizeAfter = stockLikes.get(symbol).size;
+  
+  // Debug logging
+  console.log(`💖 Like Debug - ${symbol}: like=${like}, before=${sizeBefore}, after=${sizeAfter}, IP=${ip.substring(0, 8)}...`);
+  
+  return sizeAfter;
 }
 
 module.exports = function (app) {
   app.route('/api/stock-prices')
     .get(async function (req, res) {
       const { stock, like } = req.query;
-      const ip = anonymizeIp(req.ip);
+      const ip = anonymizeIp(req);
       const likeFlag = like === 'true';
 
       // Handle multiple stocks
