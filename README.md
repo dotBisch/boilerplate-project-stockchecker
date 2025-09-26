@@ -1,13 +1,14 @@
 # Stock Price Checker
 
-A full stack JavaScript app for checking real-time stock prices and tracking likes per stock, built for the freeCodeCamp Information Security curriculum.
+A lightweight JavaScript app for checking real-time stock prices with in-memory like tracking, built for the freeCodeCamp Information Security curriculum.
 
 ## Features
 
 - View real-time stock prices using the [freeCodeCamp Stock Price Proxy API](https://stock-price-checker-proxy.freecodecamp.rocks/)
-- Like a stock (one like per IP, anonymized for privacy)
+- Like a stock (one like per IP, anonymized for privacy) - stored in memory
 - Compare two stocks and see the relative difference in likes
 - Security features including strict Content Security Policy
+- **No database required** - runs entirely API-based with in-memory storage
 
 ## Usage
 
@@ -74,10 +75,17 @@ Visit [http://localhost:3000/](http://localhost:3000/) in your browser.
   }
   ```
 
+## Architecture
+
+- **API-only**: No database required - likes are stored in memory
+- **Stateless**: Server restarts will reset all like data
+- **External API**: Stock prices fetched from freeCodeCamp's proxy API
+
 ## Security
 
 - Content Security Policy restricts scripts and CSS to your server only.
 - IP addresses are anonymized before storing likes, in compliance with privacy laws.
+- In-memory storage ensures no persistent data collection.
 
 ## Testing
 
