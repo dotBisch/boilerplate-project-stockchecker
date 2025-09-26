@@ -68,6 +68,7 @@ async function getStock(stock) {
 }
 
 module.exports = function (app) {
+  console.log('🔗 API routes being registered...');
 
   app.route('/api/stock-prices')
     .get(async function (req, res){

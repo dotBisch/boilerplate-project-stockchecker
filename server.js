@@ -44,8 +44,25 @@ app.use(helmet.contentSecurityPolicy({
 //Index page (static HTML)
 app.route('/')
   .get(function (req, res) {
-    res.sendFile(process.cwd() + '/views/index.html');
+    console.log('📋 Homepage request received');
+    try {
+      res.sendFile(process.cwd() + '/views/index.html');
+    } catch (error) {
+      console.error('❌ Error serving homepage:', error);
+      res.status(500).send('Server Error');
+    }
   });
+
+//Health check route
+app.get('/health', (req, res) => {
+  console.log('💚 Health check request received');
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    port: process.env.PORT || 3000,
+    cwd: process.cwd()
+  });
+});
 
 //For FCC testing purposes
 fccTestingRoutes(app);
