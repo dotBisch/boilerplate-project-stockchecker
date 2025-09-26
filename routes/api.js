@@ -57,8 +57,10 @@ module.exports = function (app) {
 
   app.route('/api/stock-prices')
     .get(async function (req, res){
+      console.log('📊 Stock API request received:', req.query);
       const { stock, like } = req.query;
       const ip = anonymizeIp(req.ip);
+      console.log('🔒 Anonymized IP:', ip);
 
       if (Array.isArray(stock)) {
         const stock1 = stock[0];
