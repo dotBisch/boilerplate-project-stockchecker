@@ -7,6 +7,10 @@
 "test": "cross-env NODE_ENV=test mocha --require dotenv/config --timeout 5000 --recursive --exit --ui tdd tests/",
 "dev": "nodemon server.js"
 },
+"engines": {
+"node": ">=18.0.0",
+"npm": ">=8.0.0"
+},
 "dependencies": {
 "body-parser": "^1.15.2",
 "chai": "^4.2.0",
