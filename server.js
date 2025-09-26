@@ -23,7 +23,8 @@ connectDB();
 
 const app = express();
 
-// Security with helmet - Content Security Policy
+// Security with helmet - Apply global security headers first
+app.use(helmet());
 app.use(helmet.contentSecurityPolicy({
   directives: {
     defaultSrc: ["'self'"],
